@@ -1,0 +1,26 @@
+{{> head}}
+<body class="auth-body">
+  <main class="auth-layout">
+    <section class="auth-aside">
+      <a class="brand brand-light" href="/"><span class="brand-mark">S</span><span class="brand-copy"><strong>StockTrack</strong><small>Grocery inventory</small></span></a>
+      <div class="auth-message"><span class="auth-kicker">A FRESH WAY TO MANAGE STOCK</span><h1>Your store,<br>in good order.</h1><p>Know what’s on your shelves, what needs restocking, and what’s coming up for expiry.</p><div class="auth-illustration"><span class="illustration-bag">▧</span><span class="illustration-leaf">✳</span><span class="illustration-line"></span><span class="illustration-caption">Stock smarter, waste less.</span></div></div>
+      <span class="auth-aside-footer">Grocery inventory management</span>
+    </section>
+    <section class="auth-main">
+      <div class="auth-form-wrap">
+        <div class="auth-mobile-brand"><span class="brand-mark">S</span><strong>StockTrack</strong></div>
+        <p class="eyebrow">WELCOME BACK</p><h2>Sign in to your account</h2><p class="auth-subtitle">Enter your details to continue to your inventory.</p>
+        {{#each error_msg}}<div class="notice notice-error" role="alert">{{this}}</div>{{/each}}
+        {{#each info_msg}}<div class="notice notice-success" role="status">{{this}}</div>{{/each}}
+        {{#each success_msg}}<div class="notice notice-success" role="status">{{this}}</div>{{/each}}
+        <form class="auth-form" method="POST" action="/login">
+          <label class="form-field">Email address<input type="email" name="email" placeholder="you@store.com" autocomplete="email" required></label>
+          <label class="form-field">Password<input type="password" name="password" placeholder="Enter your password" autocomplete="current-password" required></label>
+          <button class="button button-primary auth-submit" type="submit">Sign in <span>→</span></button>
+        </form>
+        <p class="auth-switch">Need an account? Contact your StockTrack administrator.</p>
+      </div>
+      <footer class="auth-legal">StockTrack · Simple, reliable grocery stock monitoring</footer>
+    </section>
+  </main>
+{{> footer}}

@@ -1,0 +1,128 @@
+{{> head}}
+<body class="app-body">
+  <div class="app-shell">
+    {{> sidebar}}
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" type="button" data-menu-toggle aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation">☰</button>
+        <div class="breadcrumb">Workspace <span>/</span><strong>User management</strong></div>
+        <div class="topbar-right">
+          <span class="today-label">{{displayName}}</span>
+          <span class="topbar-avatar" aria-hidden="true">{{avatarInitial}}</span>
+        </div>
+      </header>
+
+      <div class="page-content users-page">
+        {{#each success_msg}}<div class="notice notice-success" role="status">{{this}}<button type="button" aria-label="Dismiss" data-dismiss>×</button></div>{{/each}}
+        {{#each error_msg}}<div class="notice notice-error" role="alert">{{this}}<button type="button" aria-label="Dismiss" data-dismiss>×</button></div>{{/each}}
+
+        <section class="page-heading">
+          <div>
+            <p class="eyebrow">PEOPLE & ACCESS</p>
+            <h1>User management</h1>
+            <p class="page-subtitle">Create accounts and manage Admin and Staff access to your StockTrack workspace.</p>
+          </div>
+        </section>
+
+        <section class="metric-grid" aria-label="User summary">
+          <article class="metric-card"><div class="metric-top"><span class="metric-label">Total users</span><span class="metric-icon icon-blue" aria-hidden="true">♙</span></div><strong class="metric-value">{{totalUsers}}</strong><span class="metric-caption">Registered accounts</span></article>
+          <article class="metric-card"><div class="metric-top"><span class="metric-label">Active accounts</span><span class="metric-icon icon-green" aria-hidden="true">✓</span></div><strong class="metric-value">{{activeCount}}</strong><span class="metric-caption">Can sign in to StockTrack</span></article>
+          <article class="metric-card"><div class="metric-top"><span class="metric-label">Administrators</span><span class="metric-icon icon-amber" aria-hidden="true">♧</span></div><strong class="metric-value">{{adminCount}}</strong><span class="metric-caption">Full system access</span></article>
+          <article class="metric-card"><div class="metric-top"><span class="metric-label">Staff accounts</span><span class="metric-icon icon-red" aria-hidden="true">♙</span></div><strong class="metric-value">{{staffCount}}</strong><span class="metric-caption">View inventory and add products</span></article>
+        </section>
+
+        <section class="panel user-create-panel">
+          <div class="panel-heading">
+            <div><h2>Create an account</h2><p>Add a team member and choose Admin or Staff access.</p></div>
+          </div>
+          <form class="user-create-form" method="POST" action="/users">
+            <label class="form-field">Full name<input name="name" maxlength="120" autocomplete="name" placeholder="e.g. Alex Morgan" required></label>
+            <label class="form-field">Email address<input name="email" type="email" maxlength="254" autocomplete="email" placeholder="name@store.com" required></label>
+            <label class="form-field">Temporary password<input name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="At least 8 characters" required></label>
+            <label class="form-field">Role<select name="role" required><option value="staff">Staff</option><option value="admin">Admin</option></select></label>
+            <div class="user-form-actions"><button class="button button-primary" type="submit"><span>＋</span> Create account</button></div>
+          </form>
+        </section>
+
+        <section class="panel user-list-panel">
+          <div class="panel-heading users-list-heading">
+            <div><h2>Accounts <span class="count-pill">{{totalUsers}}</span></h2><p>Manage account details, roles, and status.</p></div>
+            <form class="filter-form user-filters" method="GET" action="/users">
+              <label class="search-field"><span aria-hidden="true">⌕</span><input type="search" name="search" value="{{search}}" placeholder="Name or email" aria-label="Search users by name or email"></label>
+              <select name="role" aria-label="Filter by role">
+                <option value="">All roles</option>
+                <option value="admin"{{#if roleIsAdmin}} selected{{/if}}>Admin</option>
+                <option value="staff"{{#if roleIsStaff}} selected{{/if}}>Staff</option>
+              </select>
+              <select name="status" aria-label="Filter by status">
+                <option value="">All statuses</option>
+                <option value="active"{{#if statusFilterActive}} selected{{/if}}>Active</option>
+                <option value="deactivated"{{#if statusFilterDeactivated}} selected{{/if}}>Deactivated</option>
+              </select>
+              <select name="sort" aria-label="Sort accounts">
+                <option value="name_asc"{{#if sortIsNameAsc}} selected{{/if}}>Name A–Z</option>
+                <option value="name_desc"{{#if sortIsNameDesc}} selected{{/if}}>Name Z–A</option>
+                <option value="newest"{{#if sortIsNewest}} selected{{/if}}>Newest first</option>
+                <option value="oldest"{{#if sortIsOldest}} selected{{/if}}>Oldest first</option>
+              </select>
+              <button class="button button-secondary" type="submit">Apply</button>
+            </form>
+          </div>
+
+          {{#if hasFilteredUsers}}
+          <div class="table-wrap">
+            <table class="users-table">
+              <thead><tr><th>USER</th><th>EMAIL ADDRESS</th><th>ROLE</th><th>STATUS</th><th>DATE CREATED</th><th>ACTIONS</th></tr></thead>
+              <tbody>
+                {{#each users}}
+                <tr>
+                  <td><div class="user-identity"><span class="user-avatar" aria-hidden="true">{{initial}}</span><span><strong>{{name}}</strong><small>User ID {{id}}{{#if isCurrentUser}} · You{{/if}}</small></span></div></td>
+                  <td>{{email}}</td>
+                  <td><span class="role-badge {{#if roleIsAdmin}}role-admin{{else}}role-staff{{/if}}">{{role}}</span></td>
+                  <td><span class="badge {{statusBadgeClass}}">{{statusLabel}}</span></td>
+                  <td class="date-cell">{{createdDate}}</td>
+                  <td>
+                    <div class="user-actions">
+                      <button class="button button-secondary button-compact" type="button" data-open-user-edit data-id="{{id}}" data-name="{{name}}" data-email="{{email}}" data-role="{{role}}" data-status="{{accountStatus}}">Edit</button>
+                      <button class="button button-secondary button-compact" type="button" data-open-password-reset data-id="{{id}}" data-name="{{name}}">Reset password</button>
+                      {{#unless isCurrentUser}}
+                      <form method="POST" action="/users/{{id}}/delete" data-confirm="Delete {{name}}'s account? This cannot be undone.">
+                        <button class="button button-danger button-compact" type="submit">Delete</button>
+                      </form>
+                      {{/unless}}
+                    </div>
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+          {{else}}
+          <div class="empty-state"><span class="empty-icon" aria-hidden="true">♙</span><strong>{{#if hasUsers}}No matching accounts{{else}}No accounts yet{{/if}}</strong><p>{{#if hasUsers}}Try another search or adjust your filters.{{else}}Create an Admin or Staff account to get started.{{/if}}</p></div>
+          {{/if}}
+        </section>
+        <footer class="app-footer">StockTrack <span>·</span> People & access</footer>
+      </div>
+    </main>
+  </div>
+
+  <dialog class="modal" id="user-edit-modal">
+    <form class="modal-card" method="POST" action="#" id="user-edit-form">
+      <div class="modal-heading"><div><h2>Edit account</h2><p>Update account details, role, and access status.</p></div><button class="modal-close" type="button" aria-label="Close" data-close>×</button></div>
+      <label class="form-field">Full name<input name="name" maxlength="120" autocomplete="name" required></label>
+      <label class="form-field">Email address<input name="email" type="email" maxlength="254" autocomplete="email" required></label>
+      <label class="form-field">Role<select name="role" required><option value="staff">Staff</option><option value="admin">Admin</option></select></label>
+      <label class="form-field">Account status<select name="accountStatus" required><option value="active">Active</option><option value="deactivated">Deactivated</option></select></label>
+      <div class="modal-actions"><button class="button button-secondary" type="button" data-close>Cancel</button><button class="button button-primary" type="submit">Save changes</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal modal-narrow" id="user-password-modal">
+    <form class="modal-card" method="POST" action="#" id="user-password-form">
+      <div class="modal-heading"><div><h2>Reset password</h2><p>Set a temporary password for this account.</p></div><button class="modal-close" type="button" aria-label="Close" data-close>×</button></div>
+      <p class="stock-product-name" data-password-user></p>
+      <label class="form-field">New temporary password<input name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" required></label>
+      <div class="modal-actions"><button class="button button-secondary" type="button" data-close>Cancel</button><button class="button button-primary" type="submit">Reset password</button></div>
+    </form>
+  </dialog>
+{{> footer}}

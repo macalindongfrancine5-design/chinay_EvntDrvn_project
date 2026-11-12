@@ -1,0 +1,203 @@
+{{> head}}
+<body class="app-body">
+  <div class="app-shell">
+    {{> sidebar}}
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" type="button" data-menu-toggle aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation">☰</button>
+        <div class="breadcrumb">Workspace <span>/</span><strong>Inventory</strong></div>
+        <div class="topbar-right">
+          <span class="today-label">{{displayName}}</span>
+          <span class="topbar-avatar" aria-hidden="true">{{avatarInitial}}</span>
+        </div>
+      </header>
+
+      <div class="page-content inventory-page">
+        {{#each success_msg}}<div class="notice notice-success" role="status">{{this}}<button type="button" aria-label="Dismiss" data-dismiss>×</button></div>{{/each}}
+        {{#each error_msg}}<div class="notice notice-error" role="alert">{{this}}<button type="button" aria-label="Dismiss" data-dismiss>×</button></div>{{/each}}
+
+        <section class="page-heading">
+          <div>
+            <p class="eyebrow">STOCK CONTROL</p>
+            <h1>Inventory</h1>
+            <p class="page-subtitle">A clear view of your products, stock levels, and upcoming expirations.</p>
+          </div>
+          {{#if canAddProducts}}
+          <button class="button button-primary" type="button" data-open-product><span>＋</span> Add product</button>
+          {{/if}}
+        </section>
+
+        <section class="metric-grid" aria-label="Inventory summary">
+          <article class="metric-card">
+            <div class="metric-top"><span class="metric-label">Total products</span><span class="metric-icon icon-green" aria-hidden="true">▤</span></div>
+            <strong class="metric-value">{{totalProducts}}</strong><span class="metric-caption">Active products</span>
+          </article>
+          <article class="metric-card">
+            <div class="metric-top"><span class="metric-label">Available stock</span><span class="metric-icon icon-blue" aria-hidden="true">▥</span></div>
+            <strong class="metric-value">{{availableStockDisplay}}</strong><span class="metric-caption">Units across all products</span>
+          </article>
+          <article class="metric-card">
+            <div class="metric-top"><span class="metric-label">Low stock</span><span class="metric-icon icon-amber" aria-hidden="true">!</span></div>
+            <strong class="metric-value">{{lowStockCount}}</strong><span class="metric-caption">Items at or below reorder level</span>
+          </article>
+          <article class="metric-card">
+            <div class="metric-top"><span class="metric-label">Out of stock</span><span class="metric-icon icon-red" aria-hidden="true">×</span></div>
+            <strong class="metric-value">{{outOfStockCount}}</strong><span class="metric-caption">Items that need replenishment</span>
+          </article>
+        </section>
+
+        <section class="expiry-summary" aria-label="Expiration summary">
+          <div><span class="expiry-summary-icon" aria-hidden="true">◷</span><span><strong>{{expiringSoonCount}}</strong> nearing expiration within 30 days</span></div>
+          <div><span class="expiry-summary-icon expiry-summary-danger" aria-hidden="true">!</span><span><strong>{{expiredCount}}</strong> expired products</span></div>
+          {{#if missingExpiryCount}}<div><span class="expiry-summary-icon" aria-hidden="true">!</span><span><strong>{{missingExpiryCount}}</strong> without an expiration date</span></div>{{/if}}
+        </section>
+
+        <section class="panel inventory-panel">
+          <div class="panel-heading inventory-heading">
+            <div><h2>Products <span class="count-pill">{{totalProducts}}</span></h2><p>Search, filter, and review product details and stock status.</p></div>
+            <form class="filter-form inventory-filters" method="GET" action="/inventory">
+              <label class="search-field"><span aria-hidden="true">⌕</span><input type="search" name="search" value="{{search}}" placeholder="Name or barcode" aria-label="Search by product name or barcode"></label>
+              <select name="category" aria-label="Filter by category">
+                <option value="">All categories</option>
+                {{#each categories}}<option value="{{name}}"{{#if isSelected}} selected{{/if}}>{{name}}</option>{{/each}}
+              </select>
+              <select name="status" aria-label="Filter by stock or expiration status">
+                <option value="">All statuses</option>
+                <option value="in_stock"{{#if statusIsInStock}} selected{{/if}}>In stock</option>
+                <option value="low_stock"{{#if statusIsLowStock}} selected{{/if}}>Low stock</option>
+                <option value="out_of_stock"{{#if statusIsOutOfStock}} selected{{/if}}>Out of stock</option>
+                <option value="expiring"{{#if statusIsExpiring}} selected{{/if}}>Expiring soon</option>
+                <option value="expired"{{#if statusIsExpired}} selected{{/if}}>Expired</option>
+              </select>
+              <select name="sort" aria-label="Sort products">
+                <option value="name_asc"{{#if sortIsNameAsc}} selected{{/if}}>Name A–Z</option>
+                <option value="name_desc"{{#if sortIsNameDesc}} selected{{/if}}>Name Z–A</option>
+                <option value="quantity_asc"{{#if sortIsQuantityAsc}} selected{{/if}}>Quantity low to high</option>
+                <option value="quantity_desc"{{#if sortIsQuantityDesc}} selected{{/if}}>Quantity high to low</option>
+                <option value="expiry_asc"{{#if sortIsExpiryAsc}} selected{{/if}}>Expiration date</option>
+              </select>
+              <button class="button button-secondary" type="submit">Apply</button>
+            </form>
+          </div>
+
+          {{#if hasFilteredProducts}}
+          <div class="table-wrap">
+            <table class="inventory-grid-table">
+              <thead>
+                <tr><th>PRODUCT</th><th>CATEGORY</th><th>BRAND</th><th>BARCODE</th><th>PURCHASE</th><th>SELLING</th><th>QUANTITY</th><th>STATUS</th><th>EXPIRATION</th><th>SUPPLIER</th><th>ACTIONS</th></tr>
+              </thead>
+              <tbody>
+                {{#each products}}
+                <tr class="{{#if isOutOfStock}}inventory-row-out{{else}}{{#if isLowStock}}inventory-row-low{{/if}}{{/if}}">
+                  <td>
+                    <div class="product-cell inventory-product-cell">
+                      {{#if imageUrl}}<img class="product-thumb inventory-product-image" src="{{imageUrl}}" alt="" loading="lazy">{{else}}<span class="product-thumb inventory-product-image" aria-hidden="true">{{name}}</span>{{/if}}
+                      <span><strong>{{name}}</strong><small>ID {{id}} · {{sku}}</small></span>
+                    </div>
+                  </td>
+                  <td>{{category}}</td>
+                  <td>{{brandDisplay}}</td>
+                  <td>{{barcodeDisplay}}</td>
+                  <td>₱{{purchasePriceDisplay}}</td>
+                  <td>₱{{sellingPriceDisplay}}</td>
+                  <td><strong>{{quantityDisplay}}</strong> <span class="unit-label">{{unit}}</span></td>
+                  <td><span class="badge {{stockBadgeClass}}">{{stockStatus}}</span></td>
+                  <td>{{#if expiryBadgeClass}}<span class="badge {{expiryBadgeClass}}">{{expiryDateDisplay}}</span>{{else}}{{expiryDateDisplay}}{{/if}}</td>
+                  <td>{{supplierDisplay}}</td>
+                  <td>
+                    <div class="inventory-actions">
+                      {{#if ../isAdmin}}
+                      <button class="button button-secondary button-compact" type="button" data-open-edit data-id="{{id}}" data-name="{{name}}" data-category="{{category}}" data-brand="{{brand}}" data-barcode="{{barcode}}" data-supplier="{{supplier}}" data-unit="{{unit}}" data-quantity="{{quantity}}" data-reorder="{{reorderLevel}}" data-purchase="{{purchasePrice}}" data-selling="{{sellingPrice}}" data-expiry="{{expiryDate}}">Edit</button>
+                      <button class="button button-stock-in button-compact" type="button" data-open-stock data-type="stock_in" data-id="{{id}}" data-name="{{name}}">Stock in</button>
+                      <button class="button button-stock-out button-compact" type="button" data-open-stock data-type="stock_out" data-id="{{id}}" data-name="{{name}}" data-quantity="{{quantity}}">Stock out</button>
+                      {{/if}}
+                    </div>
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+          {{else}}
+          <div class="empty-state">
+            <span class="empty-icon" aria-hidden="true">▤</span>
+            <strong>{{#if hasProducts}}No matching products{{else}}No products yet{{/if}}</strong>
+            <p>{{#if hasProducts}}Try adjusting the search or filters.{{else}}Add your first product to start tracking stock.{{/if}}</p>
+            {{#if canAddProducts}}{{#unless hasProducts}}<button class="button button-primary" type="button" data-open-product>Add your first product</button>{{/unless}}{{/if}}
+          </div>
+          {{/if}}
+        </section>
+
+        <section class="panel inventory-history">
+          <div class="panel-heading">
+            <div><h2>Inventory history</h2><p>Latest stock-in and stock-out activity, including who recorded it.</p></div>
+          </div>
+          {{#if hasMovements}}
+          <div class="table-wrap">
+            <table class="history-table">
+              <thead><tr><th>PRODUCT</th><th>TYPE</th><th>QUANTITY</th><th>NOTE</th><th>DATE</th><th>RECORDED BY</th></tr></thead>
+              <tbody>
+                {{#each recentMovements}}
+                <tr>
+                  <td><strong>{{Product.name}}</strong><small class="subline">{{Product.sku}}</small></td>
+                  <td><span class="movement-label {{movementClass}}">{{movementLabel}}</span></td>
+                  <td>{{quantityDisplay}}</td>
+                  <td>{{#if note}}{{note}}{{else}}—{{/if}}</td>
+                  <td class="date-cell">{{dateDisplay}}</td>
+                  <td>{{userResponsible}}</td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+          {{else}}
+          <div class="empty-state compact"><strong>No stock activity yet</strong><p>Stock receipts and releases will appear here.</p></div>
+          {{/if}}
+        </section>
+        <footer class="app-footer">StockTrack <span>·</span> Grocery inventory</footer>
+      </div>
+    </main>
+  </div>
+
+  {{#if canAddProducts}}
+  <dialog class="modal" id="product-modal">
+    <form class="modal-card inventory-modal-card" method="POST" action="/products" id="product-form" enctype="multipart/form-data">
+      <div class="modal-heading">
+        <div><h2 id="product-modal-title">Add product</h2><p>Enter product details and an expiration date.</p></div>
+        <button class="modal-close" type="button" aria-label="Close" data-close>×</button>
+      </div>
+      <div class="form-grid">
+        <label class="form-field">Product name<input name="name" maxlength="120" placeholder="e.g. Whole milk" required></label>
+        <label class="form-field">Category<input name="category" maxlength="60" placeholder="e.g. Dairy" required></label>
+        <label class="form-field">Brand<input name="brand" maxlength="80" placeholder="e.g. Magnolia"></label>
+        <label class="form-field">Barcode<input name="barcode" maxlength="80" inputmode="numeric" placeholder="Scan or enter barcode"></label>
+        <label class="form-field">Purchase price (₱)<input name="purchasePrice" type="number" min="0" max="99999999.99" step="0.01" value="0" required></label>
+        <label class="form-field">Selling price (₱)<input name="sellingPrice" type="number" min="0" max="99999999.99" step="0.01" value="0" required></label>
+        <label class="form-field">Unit of measurement<select name="unit" required><option value="pcs">Pieces</option><option value="kg">Kilograms</option><option value="g">Grams</option><option value="L">Liters</option><option value="mL">Milliliters</option><option value="pack">Packs</option><option value="bottle">Bottles</option><option value="box">Boxes</option></select></label>
+        <label class="form-field">Expiration date<input name="expiryDate" type="date" required></label>
+        <label class="form-field">Supplier<input name="supplier" maxlength="120" placeholder="Supplier name"></label>
+        <label class="form-field stock-create-only">Opening quantity<input name="quantity" type="number" min="0" max="99999999.99" step="0.01" value="0" required></label>
+        <label class="form-field">Low-stock alert at<input name="reorderLevel" type="number" min="0" max="99999999.99" step="0.01" value="5" required></label>
+        <label class="form-field field-wide">Product image <span class="field-hint">JPEG, PNG, or WebP; up to 5 MB</span><input name="image" type="file" accept="image/jpeg,image/png,image/webp"></label>
+        <div class="stock-edit-current field-wide" hidden><span>Current quantity</span><strong data-current-quantity></strong><small>Use Stock in or Stock out to record quantity changes.</small></div>
+      </div>
+      <div class="modal-actions"><button class="button button-secondary" type="button" data-close>Cancel</button><button class="button button-primary" type="submit" id="product-submit">Add product</button></div>
+    </form>
+  </dialog>
+
+  {{#if isAdmin}}
+  <dialog class="modal" id="stock-modal">
+    <form class="modal-card stock-modal-card" method="POST" action="#" id="stock-form">
+      <div class="modal-heading">
+        <div><h2 id="stock-modal-title">Stock in</h2><p id="stock-modal-description">Record a product quantity change.</p></div>
+        <button class="modal-close" type="button" aria-label="Close" data-close>×</button>
+      </div>
+      <p class="stock-product-name" data-stock-product></p>
+      <label class="form-field">Quantity<input name="quantity" type="number" min="0.01" max="99999999.99" step="0.01" required></label>
+      <label class="form-field">Note <span class="field-hint">Optional; for example, delivery or sale reference</span><input name="note" maxlength="255" placeholder="Add a note"></label>
+      <div class="modal-actions"><button class="button button-secondary" type="button" data-close>Cancel</button><button class="button button-primary" type="submit" id="stock-submit">Record stock in</button></div>
+    </form>
+  </dialog>
+  {{/if}}
+  {{/if}}
+{{> footer}}

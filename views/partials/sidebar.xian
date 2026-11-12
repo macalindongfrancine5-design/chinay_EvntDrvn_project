@@ -1,0 +1,29 @@
+<aside class="sidebar" id="sidebar" aria-label="Main navigation">
+  <a class="brand" href="/dashboard">
+    <span class="brand-mark">S</span>
+    <span class="brand-copy"><strong>StockTrack</strong><small>Grocery inventory</small></span>
+  </a>
+  <button class="sidebar-close" type="button" data-menu-toggle aria-controls="sidebar" aria-expanded="false" aria-label="Close navigation">×</button>
+  <span class="sidebar-label">WORKSPACE</span>
+  <nav class="side-nav" aria-label="Workspace">
+    {{#if isAdmin}}
+    <a class="nav-link{{#if isDashboard}} active{{/if}}" href="/dashboard"{{#if isDashboard}} aria-current="page"{{/if}}><span class="nav-icon" aria-hidden="true">⌂</span><span>Dashboard</span></a>
+    {{/if}}
+    <a class="nav-link{{#if isInventory}} active{{/if}}" href="/inventory"{{#if isInventory}} aria-current="page"{{/if}}><span class="nav-icon" aria-hidden="true">▤</span><span>Inventory</span></a>
+    {{#if isAdmin}}
+    <a class="nav-link{{#if isUserManagement}} active{{/if}}" href="/users"{{#if isUserManagement}} aria-current="page"{{/if}}><span class="nav-icon" aria-hidden="true">♙</span><span>User management</span></a>
+    {{/if}}
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="sidebar-tip">
+      <span class="tip-icon" aria-hidden="true">✦</span>
+      <strong>Stay in stock</strong>
+      <p>Check low-stock items regularly to keep your shelves ready.</p>
+    </div>
+    <a class="profile-link" href="/logout">
+      <span class="avatar" aria-hidden="true">S</span>
+      <span class="profile-copy"><strong>{{displayName}}</strong><small>Log out</small></span>
+      <span class="profile-arrow" aria-hidden="true">↗</span>
+    </a>
+  </div>
+</aside>
