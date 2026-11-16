@@ -1,5 +1,5 @@
 {{> head}}
-<body class="auth-body">
+<body class="auth-body login-page">
   <main class="auth-layout">
     <section class="auth-aside">
       <a class="brand brand-light" href="/"><span class="brand-mark">S</span><span class="brand-copy"><strong>StockTrack</strong><small>Grocery inventory</small></span></a>

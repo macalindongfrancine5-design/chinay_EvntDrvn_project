@@ -30,7 +30,7 @@ export const loginPage = (req, res) => res.render("login", {
   title: "Login",
   error_msg: req.query.deactivated === "1"
     ? ["This account is deactivated. Contact an administrator for access."]
-    : [],
+    : res.locals.error_msg || [],
   info_msg: req.query.registration === "admin-only"
     ? ["StockTrack accounts are created by an administrator."]
     : []
