@@ -17,7 +17,8 @@
     "create:add-middleware": "node create.js middleware",
     "create:upload-middleware": "node create.js upload-middleware",
     "route:list": "node list-routes.js",
-    "route:cache": "node route-cache.js"
+    "route:cache": "node route-cache.js",
+    "seed": "node seed.js"
   },
   "dependencies": {
     "express": "^4.19.2",

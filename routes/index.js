@@ -61,7 +61,7 @@ router.get("/register", (req, res) => res.redirect("/login?registration=admin-on
 router.post("/register", (req, res) => res.redirect("/login?registration=admin-only"));
 router.get("/forgot-password", forgotPasswordPage);
 router.get("/dashboard", requireAuth, requireAdmin, dashboardPage);
-router.get("/inventory", requireAuth, inventoryPage);
+router.get("/inventory", requireAuth, requireInventoryStaff, inventoryPage);
 router.get("/users", requireAuth, requireAdmin, usersPage);
 router.post("/users", requireAuth, requireAdmin, createUser);
 router.post("/users/:id/update", requireAuth, requireAdmin, updateUser);
