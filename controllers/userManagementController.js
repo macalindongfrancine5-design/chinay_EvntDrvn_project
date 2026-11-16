@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { sequelize } from "../models/db.js";
 import { User } from "../models/userModel.js";
 
-const userRoles = ["admin", "staff"];
+const userRoles = ["admin", "staff", "cashier"];
 const accountStatuses = ["active", "deactivated"];
 
 function readUserForm(body, { requirePassword = false } = {}) {
@@ -15,7 +15,7 @@ function readUserForm(body, { requirePassword = false } = {}) {
   if (!name || name.length > 120 || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: "Enter a name and a valid email address." };
   }
-  if (!userRoles.includes(role)) return { error: "Choose Admin or Staff." };
+  if (!userRoles.includes(role)) return { error: "Choose Admin, Staff, or Cashier." };
   if (!accountStatuses.includes(accountStatus)) return { error: "Choose a valid account status." };
   if ((requirePassword || password) && (password.length < 8 || password.length > 72)) {
     return { error: "Passwords must be between 8 and 72 characters." };
@@ -28,6 +28,7 @@ function mapUser(user, currentUserId) {
   item.isCurrentUser = String(user.id) === String(currentUserId);
   item.roleIsAdmin = user.role === "admin";
   item.roleIsStaff = user.role === "staff";
+  item.roleIsCashier = user.role === "cashier";
   item.statusIsActive = user.accountStatus === "active";
   item.statusLabel = item.statusIsActive ? "Active" : "Deactivated";
   item.statusBadgeClass = item.statusIsActive ? "badge-green" : "badge-red";
@@ -86,6 +87,7 @@ export const usersPage = async (req, res) => {
       statusFilter,
       roleIsAdmin: roleFilter === "admin",
       roleIsStaff: roleFilter === "staff",
+      roleIsCashier: roleFilter === "cashier",
       statusFilterActive: statusFilter === "active",
       statusFilterDeactivated: statusFilter === "deactivated",
       sortIsNameAsc: sort === "name_asc",

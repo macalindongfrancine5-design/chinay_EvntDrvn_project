@@ -376,6 +376,7 @@ td strong { color: #344139; font-weight: 600; }
 .role-badge { display: inline-flex; min-height: 23px; align-items: center; padding: 0 9px; border-radius: 5px; font-size: 10px; font-weight: 600; text-transform: capitalize; }
 .role-admin { color: #536884; background: #edf2f8; }
 .role-staff { color: #8c661e; background: #fff4dc; }
+.role-cashier { color: #526c48; background: #edf6e9; }
 .user-actions { display: flex; min-width: 250px; align-items: center; gap: 5px; }
 .user-actions form { margin: 0; }
 .button-danger { border-color: #f0dfda; color: #a35349; background: #fff8f6; }

@@ -7,9 +7,12 @@ export async function ensureUserSchema() {
   const roleType = String(users.role?.type || "").toLowerCase();
 
   if (roleType.includes("visitors")) {
-    await sequelize.query("ALTER TABLE `Users` MODIFY COLUMN `role` ENUM('admin','staff','visitors') NOT NULL DEFAULT 'staff'");
+    await sequelize.query("ALTER TABLE `Users` MODIFY COLUMN `role` ENUM('admin','staff','cashier','visitors') NOT NULL DEFAULT 'staff'");
     await sequelize.query("UPDATE `Users` SET `role` = 'staff' WHERE `role` = 'visitors'");
-    await sequelize.query("ALTER TABLE `Users` MODIFY COLUMN `role` ENUM('admin','staff') NOT NULL DEFAULT 'staff'");
+  }
+
+  if (!roleType.includes("cashier") || roleType.includes("visitors")) {
+    await sequelize.query("ALTER TABLE `Users` MODIFY COLUMN `role` ENUM('admin','staff','cashier') NOT NULL DEFAULT 'staff'");
   }
 
   if (!users.accountStatus) {

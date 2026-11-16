@@ -20,7 +20,7 @@
           <div>
             <p class="eyebrow">PEOPLE & ACCESS</p>
             <h1>User management</h1>
-            <p class="page-subtitle">Create accounts and manage Admin and Staff access to your StockTrack workspace.</p>
+            <p class="page-subtitle">Create accounts and manage Admin, Staff, and Cashier access to your StockTrack workspace.</p>
           </div>
         </section>
 
@@ -33,13 +33,13 @@
 
         <section class="panel user-create-panel">
           <div class="panel-heading">
-            <div><h2>Create an account</h2><p>Add a team member and choose Admin or Staff access.</p></div>
+            <div><h2>Create an account</h2><p>Add a team member and choose Admin, Staff, or Cashier access.</p></div>
           </div>
           <form class="user-create-form" method="POST" action="/users">
             <label class="form-field">Full name<input name="name" maxlength="120" autocomplete="name" placeholder="e.g. Alex Morgan" required></label>
             <label class="form-field">Email address<input name="email" type="email" maxlength="254" autocomplete="email" placeholder="name@store.com" required></label>
             <label class="form-field">Temporary password<input name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="At least 8 characters" required></label>
-            <label class="form-field">Role<select name="role" required><option value="staff">Staff</option><option value="admin">Admin</option></select></label>
+            <label class="form-field">Role<select name="role" required><option value="staff">Staff</option><option value="cashier">Cashier</option><option value="admin">Admin</option></select></label>
             <div class="user-form-actions"><button class="button button-primary" type="submit"><span>＋</span> Create account</button></div>
           </form>
         </section>
@@ -53,6 +53,7 @@
                 <option value="">All roles</option>
                 <option value="admin"{{#if roleIsAdmin}} selected{{/if}}>Admin</option>
                 <option value="staff"{{#if roleIsStaff}} selected{{/if}}>Staff</option>
+                <option value="cashier"{{#if roleIsCashier}} selected{{/if}}>Cashier</option>
               </select>
               <select name="status" aria-label="Filter by status">
                 <option value="">All statuses</option>
@@ -78,7 +79,7 @@
                 <tr>
                   <td><div class="user-identity"><span class="user-avatar" aria-hidden="true">{{initial}}</span><span><strong>{{name}}</strong><small>User ID {{id}}{{#if isCurrentUser}} · You{{/if}}</small></span></div></td>
                   <td>{{email}}</td>
-                  <td><span class="role-badge {{#if roleIsAdmin}}role-admin{{else}}role-staff{{/if}}">{{role}}</span></td>
+                  <td><span class="role-badge {{#if roleIsAdmin}}role-admin{{else if roleIsCashier}}role-cashier{{else}}role-staff{{/if}}">{{role}}</span></td>
                   <td><span class="badge {{statusBadgeClass}}">{{statusLabel}}</span></td>
                   <td class="date-cell">{{createdDate}}</td>
                   <td>
@@ -98,7 +99,7 @@
             </table>
           </div>
           {{else}}
-          <div class="empty-state"><span class="empty-icon" aria-hidden="true">♙</span><strong>{{#if hasUsers}}No matching accounts{{else}}No accounts yet{{/if}}</strong><p>{{#if hasUsers}}Try another search or adjust your filters.{{else}}Create an Admin or Staff account to get started.{{/if}}</p></div>
+          <div class="empty-state"><span class="empty-icon" aria-hidden="true">♙</span><strong>{{#if hasUsers}}No matching accounts{{else}}No accounts yet{{/if}}</strong><p>{{#if hasUsers}}Try another search or adjust your filters.{{else}}Create an Admin, Staff, or Cashier account to get started.{{/if}}</p></div>
           {{/if}}
         </section>
         <footer class="app-footer">StockTrack <span>·</span> People & access</footer>
@@ -111,7 +112,7 @@
       <div class="modal-heading"><div><h2>Edit account</h2><p>Update account details, role, and access status.</p></div><button class="modal-close" type="button" aria-label="Close" data-close>×</button></div>
       <label class="form-field">Full name<input name="name" maxlength="120" autocomplete="name" required></label>
       <label class="form-field">Email address<input name="email" type="email" maxlength="254" autocomplete="email" required></label>
-      <label class="form-field">Role<select name="role" required><option value="staff">Staff</option><option value="admin">Admin</option></select></label>
+      <label class="form-field">Role<select name="role" required><option value="staff">Staff</option><option value="cashier">Cashier</option><option value="admin">Admin</option></select></label>
       <label class="form-field">Account status<select name="accountStatus" required><option value="active">Active</option><option value="deactivated">Deactivated</option></select></label>
       <div class="modal-actions"><button class="button button-secondary" type="button" data-close>Cancel</button><button class="button button-primary" type="submit">Save changes</button></div>
     </form>
